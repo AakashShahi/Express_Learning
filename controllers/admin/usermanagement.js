@@ -2,12 +2,12 @@
 const User = require("../../models/User")
 const bcrypt = require("bcrypt")
 
-//Ceate
+//Create
 exports.createUsers = async (req, res) => {
     const { username, email, firstName, lastName, password } = req.body;
     //validation
     if (!username || !email || !firstName || !lastName || !password) {
-        return res.status(400).jsom(
+        return res.status(400).json(
             {
                 "success": false,
                 "message": "Missing Field"

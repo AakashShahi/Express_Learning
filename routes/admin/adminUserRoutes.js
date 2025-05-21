@@ -2,6 +2,8 @@ const express=require("express")
 const router=express.Router()
 
 const {createUsers,getUsers,getOneUser,updateOneUser,deleteOneUser}=require("../../controllers/admin/usermanagement")
+const{authenticateUser, isAdmin}=require("../../middlewares/authorizedUser")
+
 router.post(
     "/create",
     createUsers
@@ -9,6 +11,8 @@ router.post(
 
 router.get(
     "/",
+    authenticateUser,
+    isAdmin,
     getUsers
 )
 

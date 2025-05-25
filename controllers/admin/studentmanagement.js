@@ -1,6 +1,6 @@
 const Student = require("../../models/Student")
 const bcrypt = require("bcrypt")
-const { findOne } = require("../../models/User")
+
 
 //Create
 exports.createStudents = async (req, res) => {

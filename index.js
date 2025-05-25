@@ -5,6 +5,8 @@ const userRoutes=require("./routes/userRoutes")
 const studentRoutes=require("./routes/studentRoutes")
 const adminUserRoutes=require("./routes/admin/adminUserRoutes")
 const adminStudentRoutes=require("./routes/admin/adminStudentRoutes")
+const adminCategoryRoutes=require("./routes/admin/adminCategoryRoutes")
+const adminProductRoutes=require("./routes/admin/adminProductRoutes")
 const app = express();
 
 connectDB()
@@ -15,6 +17,8 @@ app.use("/api/auth",userRoutes)
 app.use("/api/student",studentRoutes)
 app.use("/api/admin/user",adminUserRoutes)
 app.use("/api/admin/student",adminStudentRoutes)
+app.use("/api/admin/category",adminCategoryRoutes)
+app.use("/api/admin/product",adminProductRoutes)
 
 
 app.get('/', // "/" root path

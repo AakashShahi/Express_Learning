@@ -1,24 +1,32 @@
 require("dotenv").config()
 const express = require("express");
-const connectDB=require("./config/db")
-const userRoutes=require("./routes/userRoutes")
-const studentRoutes=require("./routes/studentRoutes")
-const adminUserRoutes=require("./routes/admin/adminUserRoutes")
-const adminStudentRoutes=require("./routes/admin/adminStudentRoutes")
-const adminCategoryRoutes=require("./routes/admin/adminCategoryRoutes")
-const adminProductRoutes=require("./routes/admin/adminProductRoutes")
+const connectDB = require("./config/db")
+const userRoutes = require("./routes/userRoutes")
+const studentRoutes = require("./routes/studentRoutes")
+const adminUserRoutes = require("./routes/admin/adminUserRoutes")
+const adminStudentRoutes = require("./routes/admin/adminStudentRoutes")
+const adminCategoryRoutes = require("./routes/admin/adminCategoryRoutes")
+const adminProductRoutes = require("./routes/admin/adminProductRoutes")
+const path = require("path")
+const cors = require("cors")
 const app = express();
+let corsOptions = {
+    origin: "*"// can provide list of domian
+}
+app.use(cors(corsOptions))
 
+//connetion implementation
 connectDB()
 
 app.use(express.json())//accept json in request
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
-app.use("/api/auth",userRoutes)
-app.use("/api/student",studentRoutes)
-app.use("/api/admin/user",adminUserRoutes)
-app.use("/api/admin/student",adminStudentRoutes)
-app.use("/api/admin/category",adminCategoryRoutes)
-app.use("/api/admin/product",adminProductRoutes)
+app.use("/api/auth", userRoutes)
+app.use("/api/student", studentRoutes)
+app.use("/api/admin/users", adminUserRoutes)
+app.use("/api/admin/student", adminStudentRoutes)
+app.use("/api/admin/category", adminCategoryRoutes)
+app.use("/api/admin/product", adminProductRoutes)
 
 
 app.get('/', // "/" root path
@@ -169,18 +177,18 @@ app.get("/blogs/:blogId",
 
 //data add/add to blogs
 app.post("/blogs/",
-    (req,res)=>{
-        console.log("Body",req.body)//all request
+    (req, res) => {
+        console.log("Body", req.body)//all request
         //{id:1, name:"asd,title:"123",desc:"123123"}
         //const id=req.body.id
-        const {id,name, title,desc}=req.body
+        const { id, name, title, desc } = req.body
         //validation
-        if(!id||!name||!title||!desc){
+        if (!id || !name || !title || !desc) {
             return res.status(404).json(
                 {
-                    "success":false,
-                    "message":"Not enough data provided"
-                    
+                    "success": false,
+                    "message": "Not enough data provided"
+
                 }
             )
         }
@@ -195,8 +203,8 @@ app.post("/blogs/",
 
         return res.status(200).json(
             {
-                "success":true,
-                "message":"Blog added"
+                "success": true,
+                "message": "Blog added"
 
             }
         )
@@ -206,23 +214,23 @@ app.post("/blogs/",
 
 // update put/patch -> data update
 app.put("/blogs/:blogid",
-    (req,res)=>{
-        let blogId=req.params.blogid
+    (req, res) => {
+        let blogId = req.params.blogid
         let foundIdx
-        for(blogIdx in blogs){
-            if(blogs[blogIdx].id==blogId){
-                foundIdx=blogIdx
+        for (blogIdx in blogs) {
+            if (blogs[blogIdx].id == blogId) {
+                foundIdx = blogIdx
                 break
             }
         }
-        const {name,title,desc}=req.body
-        blogs[foundIdx].name=name
-        blogs[foundIdx].title=title
-        blogs[foundIdx].desc=desc
+        const { name, title, desc } = req.body
+        blogs[foundIdx].name = name
+        blogs[foundIdx].title = title
+        blogs[foundIdx].desc = desc
         return res.status(200).json(
             {
-                "success":true,
-                "message":"Blog updated"
+                "success": true,
+                "message": "Blog updated"
             }
         )
 
@@ -231,20 +239,20 @@ app.put("/blogs/:blogid",
 
 //Delete
 app.delete("/blogs/:blogId",
-    (req,res)=>{
-        let blogId=req.params.blogId
-        blogs=blogs.filter((blog)=>blog.id!=blogId)
+    (req, res) => {
+        let blogId = req.params.blogId
+        blogs = blogs.filter((blog) => blog.id != blogId)
         return res.status(200).json(
             {
-                "success":true,
-                "message":"Blog deleted"
+                "success": true,
+                "message": "Blog deleted"
             }
         )
     }
 )
 
 
-const PORT=process.env.PORT
+const PORT = process.env.PORT
 app.listen(
     PORT,
     () => {

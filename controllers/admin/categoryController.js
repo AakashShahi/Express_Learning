@@ -1,39 +1,43 @@
-const Category=require("../../models/Category")
+const Category = require("../../models/Category")
 
-exports.addCategory=async(req,res)=>{
-    const {name}=req.body
-    const existingCategory= await Category.findOne(
-        {name:name}
-    )
-
-    if(existingCategory){
-        return res.status(400).json(
+exports.addCategory = async (req, res) => {
+    try {
+        const { name } = req.body
+        const filepath = req.file?.path
+        const newCategory = new Category(
             {
-                "success": false, "msg": "Category already exists"
+                name: name,
+                filepath:filepath
             }
         )
+
+        await newCategory.save()
+
+        res.status(201).json(
+            {
+                "success": true,
+                "msg": "Category created",
+                "data":newCategory
+
+            }
+
+        )
     }
+    catch (e) {
+        console.log(e);
+        res.status(500).json( 
+            {
+                "success": false,
+                "msg": "Server error"
+            }
 
-    const newCategory=new Category(
-        {
-            name:name
-        }
-    )
-
-    await newCategory.save()
-
-    res.status(201).json(
-        {
-             "success": true,
-            "msg": "Category added"
-        }
-
-    )
+        )
+    }
 }
 
-exports.getCategory=async (req,res)=>{
+exports.getCategory = async (req, res) => {
     try {
-        const categoriess= await Category.find()
+        const categoriess = await Category.find()
         return res.status(200).json(
             {
                 "success": true,
@@ -42,7 +46,7 @@ exports.getCategory=async (req,res)=>{
             }
         )
     } catch (error) {
-         return res.status(500).json(
+        return res.status(500).json(
             {
                 "success": false,
                 "message": "Server Error"
@@ -51,11 +55,11 @@ exports.getCategory=async (req,res)=>{
     }
 }
 
-exports.getOneCategory=async (req,res)=>{
+exports.getOneCategory = async (req, res) => {
     try {
-        const _id=req.params.id
-        const category=await Category.findById(_id)
-         return res.status(200).json(
+        const _id = req.params.id
+        const category = await Category.findById(_id)
+        return res.status(200).json(
             {
                 "success": true,
                 "message": "One Category Found",
@@ -64,7 +68,7 @@ exports.getOneCategory=async (req,res)=>{
         )
 
     } catch (error) {
-         return res.status(500).json(
+        return res.status(500).json(
             {
                 "success": false,
                 "message": "Server error"
@@ -73,23 +77,23 @@ exports.getOneCategory=async (req,res)=>{
     }
 }
 
-exports.updateCategory=async (req,res) => {
-    const {name}=req.body
-    const _id=req.params.id
+exports.updateCategory = async (req, res) => {
+    const { name } = req.body
+    const _id = req.params.id
 
     try {
-        const category= await Category.updateOne(
+        const category = await Category.updateOne(
             {
-                "_id":_id
+                "_id": _id
             },
             {
-                $set:{
-                    "name":name,
+                $set: {
+                    "name": name,
                 }
             }
         )
 
-         return res.status(200).json(
+        return res.status(200).json(
             {
                 "success": true,
                 "message": "One Category Updated",
@@ -105,12 +109,12 @@ exports.updateCategory=async (req,res) => {
     }
 }
 
-exports.deleteOneCategory= async(req,res)=>{
+exports.deleteOneCategory = async (req, res) => {
     try {
-        const _id=req.params.id
-        const category=await Category.deleteOne(
+        const _id = req.params.id
+        const category = await Category.deleteOne(
             {
-                "_id":_id
+                "_id": _id
             }
         )
         return res.status(200).json(
@@ -119,9 +123,9 @@ exports.deleteOneCategory= async(req,res)=>{
                 "message": "One Category deleted",
             }
         )
-        
+
     } catch (error) {
-         return res.status(500).json(
+        return res.status(500).json(
             {
                 "success": false,
                 "message": "Server error"

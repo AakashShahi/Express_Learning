@@ -1,11 +1,14 @@
 const express=require("express")
 const router=express.Router()
+const upload=require("../../middlewares/fileupload")
+
 
 const {createUsers,getUsers,getOneUser,updateOneUser,deleteOneUser}=require("../../controllers/admin/usermanagement")
 const{authenticateUser, isAdmin}=require("../../middlewares/authorizedUser")
 
 router.post(
     "/create",
+    upload.single("avatar"),
     createUsers
 )
 

@@ -34,18 +34,48 @@ exports.addProduct = async (req, res) => {
 
 exports.getAllProduct = async (req, res) => {
     try {
-        const products = await Product.find()
+        const { page = 1, limit = 10, search = "" } = req.query
+
+        let filter={}
+
+        if(search){
+            filter.$or=[
+                {name:{$regex:search,$options:'i'}}
+            ];
+        }
+
+        const skip=(page-1)*limit
+
+
+
+        const products = await Product.find(filter)
             .populate("categoryId", "name")//1.key 2.project
             .populate("sellerId", "firstName email role")
+            .skip(skip)
+            .limit(Number(limit))
+
+        const total= await Product.countDocuments(filter)
+
+
 
         return res.status(200).json(
             {
                 "success": true,
                 "msg": "DAta  fetched",
-                data: products
+                data: products,
+                pagination:{
+                    total,
+                    page:Number(page),
+                    limit:Number(limit),
+                    totalPages:Math.ceil(total/limit)//ceil rounds number
+                }// pagination metadata
             }
         )
     } catch (error) {
+        console.log("getAllProduct",{
+            message:error.message,
+            stack:error.stack
+        });
         return res.status(500).json(
             {
                 "success": false,
@@ -60,7 +90,7 @@ exports.updateProduct = async (req, res) => {
     const _id = req.params.id
 
     try {
-        const product =await Product.updateOne(
+        const product = await Product.updateOne(
             {
                 "_id": _id
             },

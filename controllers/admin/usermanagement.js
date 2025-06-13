@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt")
 
 //Create
 exports.createUsers = async (req, res) => {
-    const { username, email, firstName, lastName, password } = req.body;
+    const { username, email, firstName, lastName, password, role } = req.body;
     //validation
     if (!username || !email || !firstName || !lastName || !password) {
         return res.status(400).json(
@@ -30,6 +30,7 @@ exports.createUsers = async (req, res) => {
         }
         //hash password
         const hashedPassword = await bcrypt.hash(password, 10) // 10 salt/complexity jaty badayo tety complex hudaii janxa
+        const avatar = req.file?.path
 
         const newUser = new User(
             {
@@ -37,14 +38,17 @@ exports.createUsers = async (req, res) => {
                 email: email,
                 firstName: firstName,
                 lastName: lastName,
-                password: hashedPassword
+                password: hashedPassword,
+                avatar: avatar,
+                role: role
             }
         )
         await newUser.save()
         return res.status(201).json(
             {
                 "success": true,
-                "msg": "User registered"
+                "msg": "User registered",
+                "data": newUser
             }
         )
 
@@ -71,6 +75,7 @@ exports.getUsers = async (req, res) => {
         )
     } catch (error) {
         return res.status(500).json(
+
             {
                 "success": false,
                 "message": "Server error"
@@ -106,7 +111,7 @@ exports.updateOneUser = async (req, res) => {
     const { firstName, lastName } = req.body
     const _id = req.params.id
     try {
-        const user =await User.updateOne(
+        const user = await User.updateOne(
             {
                 "_id": _id
             },
@@ -136,12 +141,12 @@ exports.updateOneUser = async (req, res) => {
 
 //delete
 
-exports.deleteOneUser= async(req,res)=>{
+exports.deleteOneUser = async (req, res) => {
     try {
-        const _id=req.params.id
-        const user=await User.deleteOne(
+        const _id = req.params.id
+        const user = await User.deleteOne(
             {
-                "_id":_id
+                "_id": _id
             }
         )
         return res.status(200).json(
@@ -150,9 +155,9 @@ exports.deleteOneUser= async(req,res)=>{
                 "message": "One User deleted",
             }
         )
-        
+
     } catch (error) {
-         return res.status(500).json(
+        return res.status(500).json(
             {
                 "success": false,
                 "message": "Server error"

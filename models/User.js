@@ -1,4 +1,4 @@
-const mongoose=require("mongoose")
+const mongoose = require("mongoose")
 
 const UserSchema = new mongoose.Schema(
     {
@@ -22,10 +22,11 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        role:{
-            type:String,
-            default:"normal"
-        }
+        role: {
+            type: String,
+            default: "normal"
+        },
+        avatar: { type: String }
     },
     {
         timestamps: true  // userSchema batw halda timestamp pauxa katy bela create katy bela update gareko grxa

@@ -1,11 +1,11 @@
-const User=require("../models/User")
-const bcrypt=require("bcrypt")
-const jwt=require("jsonwebtoken")
+const User = require("../models/User")
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 exports.registerUser = async (req, res) => {
-    const { username, email, firstName, lastName, password ,role} = req.body
+    const { username, email, firstName, lastName, password, role } = req.body
     try {
         const existingUser = await User.findOne(
-            { 
+            {
                 $or: [{ username: username }, { email: email }]
             }
         )
@@ -13,7 +13,7 @@ exports.registerUser = async (req, res) => {
         if (existingUser) {
             return res.status(400).json(
                 {
-                    "success": false, "msg": "User exists"
+                    "success": false, "message": "User exists"
                 }
             )
         }
@@ -27,14 +27,14 @@ exports.registerUser = async (req, res) => {
                 firstName: firstName,
                 lastName: lastName,
                 password: hashedPassword,
-                role:role
+                role: role
             }
         )
         await newUser.save()
         return res.status(201).json(
             {
                 "success": true,
-                "msg": "User registered"
+                "message": "User registered"
             }
         )
 
@@ -48,60 +48,60 @@ exports.registerUser = async (req, res) => {
     }
 }
 
-exports.loginUser= async(req,res)=>{
-    const {email,password}=req.body
-    if(!email||!password){
+exports.loginUser = async (req, res) => {
+    const { email, password } = req.body
+    if (!email || !password) {
         return res.status(400).json(
             {
-                "success":false,
-                "message":"Missing field"
+                "success": false,
+                "message": "Missing field"
             }
         )
     }
     try {
-        const getUser=await User.findOne(
-            {"email":email}
+        const getUser = await User.findOne(
+            { "email": email }
         )
 
-        if(!getUser){
+        if (!getUser) {
             return res.status(400).json(
-                {"success":false,"message":"User not found"}
+                { "success": false, "message": "User not found" }
             )
 
-            
+
         }
 
         //check for password
-        const passwordCheck= await bcrypt.compare(password,getUser.password)
-        if(!passwordCheck){
-             return res.status(400).json(
-                {"success":false,"message":"Invalid Credentials"}
+        const passwordCheck = await bcrypt.compare(password, getUser.password)
+        if (!passwordCheck) {
+            return res.status(400).json(
+                { "success": false, "message": "Invalid Credentials" }
             )
 
         }
 
         //jwt
-        const payload={
-            "_id":getUser._id,
-            "email":getUser.email,
-            "username":getUser.username,
-            "firstName":getUser.firstName,
-            "lastName":getUser.lastName
+        const payload = {
+            "_id": getUser._id,
+            "email": getUser.email,
+            "username": getUser.username,
+            "firstName": getUser.firstName,
+            "lastName": getUser.lastName
         }
 
-        const token=jwt.sign(payload, process.env.SECRET,{expiresIn:"7d"})// relogin after 7 days logic
+        const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "7d" })// relogin after 7 days logic
         return res.status(200).json(
             {
-                "success":true,
-                "message":"Login Successful",
-                "data":getUser,
-                "token":token
+                "success": true,
+                "message": "Login Successful",
+                "data": getUser,
+                "token": token
             }
         )
 
     } catch (error) {
-         return res.status(500).json(
-                {"success":false,"message":"Server error"}
-            )
+        return res.status(500).json(
+            { "success": false, "message": "Server error" }
+        )
     }
 }
